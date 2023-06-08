@@ -18,9 +18,14 @@ public class LoanController {
     @Autowired
     private LoanService loanService;
 
-    @GetMapping(path = "/loans")
-    public ResponseEntity<List<Loan>> getLoansByType(@RequestParam("type") String type) {
+    @GetMapping(path = "/rest/loans")
+    public ResponseEntity<List<Loan>> getLoansByTypeUsingRestTemplate(@RequestParam("type") String type) {
         return ResponseEntity.ok().body(loanService.getAllLoansByType(type.toUpperCase()));
+    }
+
+    @GetMapping(path = "/feign/loans")
+    public ResponseEntity<List<Loan>> getLoansByTypeUsingFeign(@RequestParam("type") String type) {
+        return ResponseEntity.ok().body(loanService.getAllLoansByTypeUsingFeign(type.toUpperCase()));
     }
 
 }

@@ -20,6 +20,9 @@ public class LoanService {
     private LoanRepository loanRepository;
 
     @Autowired
+    private FeignService feignService;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     private static final String SERVICE_NAME = "loan-service";
@@ -32,9 +35,9 @@ public class LoanService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<InterestRate> entity = new HttpEntity<>(null, headers);
         ResponseEntity<InterestRate> response = restTemplate.exchange(
-            (RATE_SERVICE_URL + type),
-            HttpMethod.GET, entity,
-            InterestRate.class
+                (RATE_SERVICE_URL + type),
+                HttpMethod.GET, entity,
+                InterestRate.class
         );
         InterestRate rate = response.getBody();
         List<Loan> loanList = new ArrayList<>();
@@ -47,7 +50,24 @@ public class LoanService {
         return loanList;
     }
 
-    public List<Loan> getDefaultLoans(Exception e) {
-        return new ArrayList<>();
+    public List<Loan> getDefaultLoans(Exception e) throws Exception {
+        throw new Exception("Rate service is down. Please try after sometime");
+    }
+
+
+    public List<Loan> getAllLoansByTypeUsingFeign(String type) {
+        InterestRate rate = feignService.getProduct(type);
+        List<Loan> loanList = new ArrayList<>();
+        if (rate != null) {
+            loanList = loanRepository.findByType(type);
+            for (Loan loan : loanList) {
+                loan.setInterest(loan.getAmount() * (rate.getRateValue() / 100));
+            }
+        }
+        return loanList;
+    }
+
+    void demoServiceFallbackMethod(Exception exc) throws Exception {
+        throw new Exception("service down");
     }
 }
