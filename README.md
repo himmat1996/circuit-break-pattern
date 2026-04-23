@@ -1,4 +1,5 @@
-# circuit-break
+# circuit-break-pattern
+
 
 A demo workspace showcasing the **Circuit Breaker pattern** in Spring Boot
 microservices using **Spring Cloud Circuit Breaker** and **Resilience4j**.
